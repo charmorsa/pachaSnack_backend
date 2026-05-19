@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ProveeService } from '../../services/proveedor/proveedor.service';
 import { JwtAuthGuard } from '../../helpers/jwt';
 
@@ -20,6 +28,11 @@ export class ProveeController {
     },
   ) {
     return this.service.create(body);
+  }
+
+  @Delete()
+  delete(@Query('id') id: number) {
+    return this.service.delete(Number(id));
   }
 
   @Get()

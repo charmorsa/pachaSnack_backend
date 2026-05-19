@@ -23,7 +23,7 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-COPY --from=build /app/server-build ./server-build
+COPY --from=build /app/app-build ./app-build
 COPY pacha.png ./pacha.png
 
 USER node

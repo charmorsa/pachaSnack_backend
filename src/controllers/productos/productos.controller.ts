@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   Body,
   Query,
   UseGuards,
@@ -50,6 +51,11 @@ export class ProductoController {
       body.id_proveedor,
       body.tamaño,
     );
+  }
+
+  @Delete()
+  delete(@Query('id') id: number) {
+    return this.service.delete(Number(id));
   }
 
   @Get()

@@ -12,7 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "target": "es2022",
     "sourceMap": true,
-    "outDir": "./server-build",
+    "outDir": "./app-build",
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,

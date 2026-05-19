@@ -30,8 +30,6 @@ services:
   #   restart: unless-stopped
 
   backend:
-    profiles:
-      - app
     build: .
     container_name: backend
     ports:

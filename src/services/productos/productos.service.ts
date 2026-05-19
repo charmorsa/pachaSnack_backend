@@ -52,11 +52,12 @@ export class ProducService {
 
   async findAll() {
     const lista = await this.repo.find();
-    if (lista.length === 0)
-      throw new BadRequestException('No hay productos registrados');
 
     return {
-      message: 'Lista de productos',
+      message:
+        lista.length === 0
+          ? 'No hay productos registrados'
+          : 'Lista de productos',
       data: lista,
       statusCode: HttpStatus.OK,
     };
@@ -113,6 +114,22 @@ export class ProducService {
       };
     } catch {
       throw new InternalServerErrorException('Error al actualizar el producto');
+    }
+  }
+
+  async delete(id: number) {
+    const producto = await this.repo.findOne({ where: { id } });
+    if (!producto) throw new BadRequestException('El producto no existe');
+
+    try {
+      await this.repo.delete({ id });
+
+      return {
+        message: 'Producto eliminado exitosamente',
+        statusCode: HttpStatus.OK,
+      };
+    } catch {
+      throw new InternalServerErrorException('Error al eliminar el producto');
     }
   }
 }

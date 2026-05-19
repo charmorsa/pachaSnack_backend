@@ -41,11 +41,12 @@ export class ProveeService {
 
   async findAll() {
     const lista = await this.repo.find();
-    if (lista.length === 0)
-      throw new BadRequestException('No hay proveedores registrados');
 
     return {
-      message: 'Lista de proveedores',
+      message:
+        lista.length === 0
+          ? 'No hay proveedores registrados'
+          : 'Lista de proveedores',
       data: lista,
       statusCode: HttpStatus.OK,
     };
@@ -60,5 +61,21 @@ export class ProveeService {
       data: lista,
       statusCode: HttpStatus.OK,
     };
+  }
+
+  async delete(id: number) {
+    const proveedor = await this.repo.findOne({ where: { id } });
+    if (!proveedor) throw new BadRequestException('El proveedor no existe');
+
+    try {
+      await this.repo.delete({ id });
+
+      return {
+        message: 'Proveedor eliminado exitosamente',
+        statusCode: HttpStatus.OK,
+      };
+    } catch {
+      throw new InternalServerErrorException('Error al eliminar el proveedor');
+    }
   }
 }
