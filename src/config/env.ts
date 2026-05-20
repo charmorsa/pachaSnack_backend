@@ -56,8 +56,8 @@ export const env = {
     url: requireEnv('RABBITMQ_HOST'),
   },
   smtp: {
-    host: optionalEnv('SMTP_HOST', 'smtp.gmail.com'),
-    port: numberEnv('SMTP_PORT', 465),
+    host: optionalEnv(process.env.SMTP_HOST, 'smtp.gmail.com'),
+    port: numberEnv(process.env.SMTP_PORT, 465),
     secure: process.env.SMTP_SECURE !== 'false',
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
