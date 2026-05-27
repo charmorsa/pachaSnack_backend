@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Body,
-  Delete,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Delete, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from '../../services/usuarios/users.service';
 import { JwtAuthGuard } from '../../helpers/jwt';
 import { ValidarBodyPipe } from '../../middleware/validateBody.middleware';
@@ -24,6 +15,7 @@ export class UsersController {
       pin: number;
       email: string;
       id_device: string;
+      notifPush:string;
     },
   ) {
     return this.service.create(body);

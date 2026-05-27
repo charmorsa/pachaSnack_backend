@@ -13,12 +13,13 @@ const users_entity_1 = require("./users.entity");
 const users_service_1 = require("../../services/usuarios/users.service");
 const users_controller_1 = require("../../controllers/usuarios/users.controller");
 const auth_module_1 = require("../auth.module");
+const push_module_1 = require("../push/push.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([users_entity_1.User]), auth_module_1.AuthModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([users_entity_1.User]), push_module_1.PushModule, auth_module_1.AuthModule],
         providers: [users_service_1.UsersService],
         controllers: [users_controller_1.UsersController, users_controller_1.UsersLogin],
     })

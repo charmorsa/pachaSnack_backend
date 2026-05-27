@@ -4,4 +4,5 @@ export declare class User {
     pin: number;
     id_device: string;
     email: string;
+    notifPush: string;
 }

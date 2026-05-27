@@ -18,8 +18,8 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const jwt_1 = require("@nestjs/jwt");
 const users_entity_1 = require("../../models/usuarios/users.entity");
-const input_rabbitMQ_1 = require("../../config/input.rabbitMQ");
 const env_1 = require("../../config/env");
+const push_service_1 = require("../push/push.service");
 function isGoogleTokenInfo(value) {
     if (!value || typeof value !== 'object')
         return false;
@@ -33,9 +33,11 @@ function isGoogleTokenInfo(value) {
 let UsersService = class UsersService {
     repo;
     jwtService;
-    constructor(repo, jwtService) {
+    pushService;
+    constructor(repo, jwtService, pushService) {
         this.repo = repo;
         this.jwtService = jwtService;
+        this.pushService = pushService;
     }
     signUserToken(user) {
         return this.jwtService.sign({
@@ -75,24 +77,14 @@ let UsersService = class UsersService {
         if (valiEmail)
             throw new common_1.ConflictException('Datos ya registrados');
         try {
-            await this.repo.save(data);
+            const user = await this.repo.save(data);
             const fecha = new Date();
             const types = 'Recuperar PIN';
-            const text = [
-                `Hola...`,
-                `Bienvenido a nuestra APP`,
-                `Queriamos avisarte que tu usuario fue creado con exito.`,
-                `El dia de hoy: ${fecha.toISOString()} podras obtener toda la informacion requerida.`,
-                `Podras consultar precios o comunicarte con nosotros directamente.`,
-                `Este es tu PIN: ${pin}, con el podras acceder desde tu celular.`,
-                `Gracias por elegirnos.`,
-            ];
-            const messages = {
-                email,
-                types,
-                text,
-            };
-            await (0, input_rabbitMQ_1.sendMessage)('email', JSON.stringify(messages));
+            if (user.notifPush) {
+                await this.pushService.sendPushNotification(user.notifPush, 'Bienvenido', 'Tu usuario fue creado correctamente', {
+                    userId: user.id,
+                });
+            }
             return {
                 message: 'Operación exitosa',
                 statusCode: common_1.HttpStatus.OK,
@@ -144,21 +136,6 @@ let UsersService = class UsersService {
         try {
             const fecha = new Date();
             const types = 'Recuperar PIN';
-            const text = [
-                `Hola...`,
-                `Te olvidaste tu PIN?.`,
-                `Detecte que cambiaste tu pin de Acceso.`,
-                `Te informo que se cambio tu pin el dia de hoy ${fecha.toISOString()}`,
-                `Si fuiste tú, ignora este correo.`,
-                `Si no fuiste tú, haznoslo saber...`,
-                `PIN: ${pin}`,
-            ];
-            const messages = {
-                email,
-                types,
-                text,
-            };
-            await (0, input_rabbitMQ_1.sendMessage)('email', JSON.stringify(messages));
             await this.repo.update({ email }, { pin, id_device });
             return {
                 message: 'Operación exitosa',
@@ -194,20 +171,6 @@ let UsersService = class UsersService {
             await this.repo.delete({ id });
             const fecha = new Date();
             const types = 'Recuperar PIN';
-            const text = [
-                `Lamentamos decirte adios...`,
-                `Se confirmo tu ida.`,
-                `Esperamos que podamos reencontrarnos en otras ocaciones.`,
-                `El dia de hoy: ${fecha.toISOString()}, fue confirmada tu acceso a nuestra aplicacion.`,
-                `Podras volver cuando gustes.`,
-                `Gracias por compartir.`,
-            ];
-            const messages = {
-                email: datos.email,
-                types,
-                text,
-            };
-            await (0, input_rabbitMQ_1.sendMessage)('email', JSON.stringify(messages));
             return {
                 message: 'Operación exitosa',
                 statusCode: common_1.HttpStatus.OK,
@@ -244,6 +207,7 @@ exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(users_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        push_service_1.PushService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

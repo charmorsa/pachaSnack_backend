@@ -17,6 +17,7 @@ let User = class User {
     pin;
     id_device;
     email;
+    notifPush;
 };
 exports.User = User;
 __decorate([
@@ -39,6 +40,10 @@ __decorate([
     (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "notifPush", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('users')
 ], User);

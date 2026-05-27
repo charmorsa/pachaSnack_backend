@@ -7,6 +7,7 @@ export declare class UsersController {
         pin: number;
         email: string;
         id_device: string;
+        notifPush: string;
     }): Promise<{
         message: string;
         statusCode: import("@nestjs/common").HttpStatus;

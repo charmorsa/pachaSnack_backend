@@ -2,10 +2,12 @@ import { HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../../models/usuarios/users.entity';
+import { PushService } from '../push/push.service';
 export declare class UsersService {
     private repo;
     private jwtService;
-    constructor(repo: Repository<User>, jwtService: JwtService);
+    private readonly pushService;
+    constructor(repo: Repository<User>, jwtService: JwtService, pushService: PushService);
     private signUserToken;
     private verifyGoogleIdToken;
     create(data: Partial<User>): Promise<{

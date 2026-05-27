@@ -7,9 +7,10 @@ import {
   UsersLogin,
 } from '../../controllers/usuarios/users.controller';
 import { AuthModule } from '../auth.module';
+import { PushModule } from '../push/push.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), AuthModule],
+  imports: [TypeOrmModule.forFeature([User]), PushModule, AuthModule],
   providers: [UsersService],
   controllers: [UsersController, UsersLogin],
 })

@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../../models/usuarios/users.entity';
 import { sendMessage } from '../../config/input.rabbitMQ';
 import { env } from '../../config/env';
+import { PushService } from '../push/push.service';
 
 type GoogleTokenInfo = {
   aud: string;
@@ -40,6 +41,7 @@ export class UsersService {
     @InjectRepository(User)
     private repo: Repository<User>,
     private jwtService: JwtService,
+    private readonly pushService: PushService,
   ) {}
 
   private signUserToken(user: User) {
@@ -96,25 +98,36 @@ export class UsersService {
     if (valiEmail) throw new ConflictException('Datos ya registrados');
 
     try {
-      await this.repo.save(data);
+      const user = await this.repo.save(data);
 
       const fecha = new Date();
       const types = 'Recuperar PIN';
-      const text = [
-        `Hola...`,
-        `Bienvenido a nuestra APP`,
-        `Queriamos avisarte que tu usuario fue creado con exito.`,
-        `El dia de hoy: ${fecha.toISOString()} podras obtener toda la informacion requerida.`,
-        `Podras consultar precios o comunicarte con nosotros directamente.`,
-        `Este es tu PIN: ${pin}, con el podras acceder desde tu celular.`,
-        `Gracias por elegirnos.`,
-      ];
-      const messages = {
-        email,
-        types,
-        text,
-      };
-      await sendMessage('email', JSON.stringify(messages));
+      // const text = [
+      //   `Hola...`,
+      //   `Bienvenido a nuestra APP`,
+      //   `Queriamos avisarte que tu usuario fue creado con exito.`,
+      //   `El dia de hoy: ${fecha.toISOString()} podras obtener toda la informacion requerida.`,
+      //   `Podras consultar precios o comunicarte con nosotros directamente.`,
+      //   `Este es tu PIN: ${pin}, con el podras acceder desde tu celular.`,
+      //   `Gracias por elegirnos.`,
+      // ];
+      // const messages = {
+      //   email,
+      //   types,
+      //   text,
+      // };
+      // await sendMessage('email', JSON.stringify(messages));
+
+      if (user.notifPush) {
+        await this.pushService.sendPushNotification(
+          user.notifPush,
+          'Bienvenido',
+          'Tu usuario fue creado correctamente',
+          {
+            userId: user.id,
+          },
+        )
+      }
 
       return {
         message: 'Operación exitosa',
@@ -170,21 +183,21 @@ export class UsersService {
     try {
       const fecha = new Date();
       const types = 'Recuperar PIN';
-      const text = [
-        `Hola...`,
-        `Te olvidaste tu PIN?.`,
-        `Detecte que cambiaste tu pin de Acceso.`,
-        `Te informo que se cambio tu pin el dia de hoy ${fecha.toISOString()}`,
-        `Si fuiste tú, ignora este correo.`,
-        `Si no fuiste tú, haznoslo saber...`,
-        `PIN: ${pin}`,
-      ];
-      const messages = {
-        email,
-        types,
-        text,
-      };
-      await sendMessage('email', JSON.stringify(messages));
+      // const text = [
+      //   `Hola...`,
+      //   `Te olvidaste tu PIN?.`,
+      //   `Detecte que cambiaste tu pin de Acceso.`,
+      //   `Te informo que se cambio tu pin el dia de hoy ${fecha.toISOString()}`,
+      //   `Si fuiste tú, ignora este correo.`,
+      //   `Si no fuiste tú, haznoslo saber...`,
+      //   `PIN: ${pin}`,
+      // ];
+      // const messages = {
+      //   email,
+      //   types,
+      //   text,
+      // };
+      // await sendMessage('email', JSON.stringify(messages));
       await this.repo.update({ email }, { pin, id_device });
       return {
         message: 'Operación exitosa',
@@ -222,20 +235,20 @@ export class UsersService {
 
       const fecha = new Date();
       const types = 'Recuperar PIN';
-      const text = [
-        `Lamentamos decirte adios...`,
-        `Se confirmo tu ida.`,
-        `Esperamos que podamos reencontrarnos en otras ocaciones.`,
-        `El dia de hoy: ${fecha.toISOString()}, fue confirmada tu acceso a nuestra aplicacion.`,
-        `Podras volver cuando gustes.`,
-        `Gracias por compartir.`,
-      ];
-      const messages = {
-        email: datos.email,
-        types,
-        text,
-      };
-      await sendMessage('email', JSON.stringify(messages));
+      // const text = [
+      //   `Lamentamos decirte adios...`,
+      //   `Se confirmo tu ida.`,
+      //   `Esperamos que podamos reencontrarnos en otras ocaciones.`,
+      //   `El dia de hoy: ${fecha.toISOString()}, fue confirmada tu acceso a nuestra aplicacion.`,
+      //   `Podras volver cuando gustes.`,
+      //   `Gracias por compartir.`,
+      // ];
+      // const messages = {
+      //   email: datos.email,
+      //   types,
+      //   text,
+      // };
+      // await sendMessage('email', JSON.stringify(messages));
 
       return {
         message: 'Operación exitosa',
